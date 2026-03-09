@@ -1,0 +1,81 @@
+<?php
+require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/../logger.php';
+session_start();
+
+$action = $_GET['action'] ?? '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true);
+
+    if ($action === 'register') {
+        $username = trim($input['username'] ?? '');
+        $email = trim($input['email'] ?? '');
+        $password = $input['password'] ?? '';
+
+        if (empty($username) || empty($email) || empty($password)) {
+            echo json_encode(['status' => 'error', 'message' => 'All fields are required.']);
+            exit;
+        }
+
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE LOWER(username) = LOWER(?) OR LOWER(email) = LOWER(?)");
+        $stmt->execute([$username, $email]);
+        if ($stmt->fetch()) {
+            echo json_encode(['status' => 'error', 'message' => 'Username or Email already exists.']);
+            exit;
+        }
+
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+        $insert = $pdo->prepare("INSERT INTO users (username, email, password, balance) VALUES (?, ?, ?, 100.0)");
+        try {
+            $insert->execute([$username, $email, $hash]);
+            log_activity('api/auth/register', $username);
+            echo json_encode(['status' => 'success', 'message' => 'Registration successful! You have been credited Rs. 100.']);
+        } catch (PDOException $e) {
+            echo json_encode(['status' => 'error', 'message' => 'Registration failed.']);
+        }
+        exit;
+    }
+
+    if ($action === 'login') {
+        $username = trim($input['username'] ?? '');
+        $password = $input['password'] ?? '';
+
+        if (empty($username) || empty($password)) {
+            echo json_encode(['status' => 'error', 'message' => 'Username and password required.']);
+            exit;
+        }
+
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE LOWER(username) = LOWER(?)");
+        $stmt->execute([$username]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user && password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            log_activity('api/auth/login', $username);
+            echo json_encode(['status' => 'success', 'message' => 'Login successful', 'user' => ['id' => $user['id'], 'username' => $user['username']]]);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid username or password.']);
+        }
+        exit;
+    }
+    
+    if ($action === 'logout') {
+        log_activity('api/auth/logout', $_SESSION['username'] ?? 'Guest');
+        session_destroy();
+        echo json_encode(['status' => 'success', 'message' => 'Logged out successfully.']);
+        exit;
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'check') {
+    if (isset($_SESSION['user_id'])) {
+        echo json_encode(['status' => 'success', 'user' => ['id' => $_SESSION['user_id'], 'username' => $_SESSION['username']]]);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Not authenticated']);
+    }
+    exit;
+}
+
+echo json_encode(['status' => 'error', 'message' => 'Invalid action']);
