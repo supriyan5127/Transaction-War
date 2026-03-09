@@ -18,7 +18,10 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
 $action = $_GET['action'] ?? '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true);
+    require_once __DIR__ . '/../crypto.php';
+    
+    $raw_input = file_get_contents('php://input');
+    $input = decrypt_payload($raw_input);
 
     if ($action === 'register') {
         $username = trim($input['username'] ?? '');
@@ -104,7 +107,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'check') {
     if (isset($_SESSION['user_id'])) {
         echo json_encode(['status' => 'success', 'user' => ['id' => $_SESSION['user_id'], 'username' => $_SESSION['username']]]);
     } else {
-        echo json_encode(['status' => 'error', 'message' => 'Not authenticated', 'ip' => $_SERVER['REMOTE_ADDR']]);
+        require_once __DIR__ . '/../logger.php';
+        echo json_encode(['status' => 'error', 'message' => 'Not authenticated', 'ip' => get_client_ip()]);
     }
     exit;
 }

@@ -38,7 +38,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'search') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'send') {
-    $input = json_decode(file_get_contents('php://input'), true);
+    require_once __DIR__ . '/../crypto.php';
+    
+    $raw_input = file_get_contents('php://input');
+    $input = decrypt_payload($raw_input);
     
     $receiver_identifier = trim($input['receiver'] ?? '');
     $amount = floatval($input['amount'] ?? 0);

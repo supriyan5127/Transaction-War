@@ -30,7 +30,17 @@ function navigate() {
     // Show View
     views.forEach(v => v.style.display = 'none');
     const activeView = document.getElementById(`view-${hash}`);
-    if (activeView) activeView.style.display = 'block';
+    if (activeView) {
+        if (hash === 'login' || hash === 'register') {
+            activeView.style.display = 'flex';
+            activeView.style.flexDirection = 'column';
+            activeView.style.justifyContent = 'center';
+            activeView.style.alignItems = 'center';
+            activeView.style.minHeight = '80vh';
+        } else {
+            activeView.style.display = 'block';
+        }
+    }
 
     // Highlight Nav
     navLinks.forEach(l => l.classList.remove('active'));

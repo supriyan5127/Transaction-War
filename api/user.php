@@ -68,8 +68,14 @@ if ($action === 'transactions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 
 // Update profile including file upload
 if ($action === 'update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email'] ?? '');
-    $bio = trim($_POST['bio'] ?? '');
+    require_once __DIR__ . '/../crypto.php';
+    
+    // We expect the encrypted string inside the boundary payload
+    $secure_data = $_POST['secure_data'] ?? '';
+    $input = decrypt_payload($secure_data);
+
+    $email = trim($input['email'] ?? '');
+    $bio = trim($input['bio'] ?? '');
     
     if (empty($email)) {
         echo json_encode(['status' => 'error', 'message' => 'Email cannot be empty']);
