@@ -99,6 +99,10 @@ async function initApp() {
             resetTimer();
         } else {
             currentUser = null;
+            if (data.ip) {
+                document.getElementById('client-ip-display').textContent = escapeHTML(data.ip);
+                document.getElementById('login-session-badge').style.display = 'flex';
+            }
         }
     } catch (e) {
         currentUser = null;
@@ -125,6 +129,12 @@ document.getElementById('form-login').addEventListener('submit', async (e) => {
         if (data.status === 'success') {
             currentUser = data.user;
             document.getElementById('nav-username').textContent = currentUser.username;
+            
+            // Dynamic Welcome Pop-up
+            document.getElementById('modal-success-title').textContent = 'Success!';
+            document.getElementById('modal-success-msg').textContent = data.message;
+            document.getElementById('success-modal').style.display = 'flex';
+            
             resetTimer();
             window.location.hash = 'dashboard';
         } else {
@@ -139,12 +149,25 @@ document.getElementById('form-login').addEventListener('submit', async (e) => {
 document.getElementById('form-register').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = e.target.querySelector('button');
-    btn.disabled = true;
+    
+    const email = document.getElementById('reg-email').value;
+    const password = document.getElementById('reg-password').value;
 
+    if (!email.toLowerCase().endsWith('@gmail.com')) {
+        showAlert('Registration restricted to @gmail.com addresses only.');
+        return;
+    }
+
+    if (password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[^a-zA-Z\d\s:]/.test(password)) {
+        showAlert('Password must be at least 8 chars long with 1 uppercase, 1 lowercase, and 1 special symbol.');
+        return;
+    }
+
+    btn.disabled = true;
     const payload = {
         username: document.getElementById('reg-username').value,
-        email: document.getElementById('reg-email').value,
-        password: document.getElementById('reg-password').value
+        email: email,
+        password: password
     };
 
     try {

@@ -30,6 +30,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
+        if (!str_ends_with(strtolower($email), '@gmail.com')) {
+            echo json_encode(['status' => 'error', 'message' => 'Only @gmail.com email addresses are allowed for registration.']);
+            exit;
+        }
+
+        // Strict Password Validation
+        if (strlen($password) < 8 || !preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password) || !preg_match('/[^a-zA-Z\d\s:]/', $password)) {
+             echo json_encode([
+                 'status' => 'error', 
+                 'message' => 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one special symbol.'
+             ]);
+             exit;
+        }
+
         $stmt = $pdo->prepare("SELECT id FROM users WHERE LOWER(username) = LOWER(?) OR LOWER(email) = LOWER(?)");
         $stmt->execute([$username, $email]);
         if ($stmt->fetch()) {
@@ -67,7 +81,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['username'] = $user['username'];
             $_SESSION['last_activity'] = time();
             log_activity('api/auth/login', $username);
-            echo json_encode(['status' => 'success', 'message' => 'Login Successful', 'user' => ['id' => $user['id'], 'username' => $user['username']]]);
+            echo json_encode([
+                'status' => 'success', 
+                'message' => 'Welcome ' . htmlspecialchars($user['username']) . '!', 
+                'user' => ['id' => $user['id'], 'username' => $user['username']]
+            ]);
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Invalid username or password.']);
         }
@@ -86,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'check') {
     if (isset($_SESSION['user_id'])) {
         echo json_encode(['status' => 'success', 'user' => ['id' => $_SESSION['user_id'], 'username' => $_SESSION['username']]]);
     } else {
-        echo json_encode(['status' => 'error', 'message' => 'Not authenticated']);
+        echo json_encode(['status' => 'error', 'message' => 'Not authenticated', 'ip' => $_SERVER['REMOTE_ADDR']]);
     }
     exit;
 }
