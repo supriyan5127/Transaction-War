@@ -59,7 +59,7 @@ window.addEventListener('hashchange', navigate);
 // Utils
 function escapeHTML(str) {
     if (!str) return '';
-    return str.toString().replace(/[&<>'"]/g, 
+    return str.toString().replace(/[&<>'"]/g,
         tag => ({
             '&': '&amp;',
             '<': '&lt;',
@@ -135,12 +135,12 @@ document.getElementById('form-login').addEventListener('submit', async (e) => {
         if (data.status === 'success') {
             currentUser = data.user;
             document.getElementById('nav-username').textContent = currentUser.username;
-            
+
             // Dynamic Welcome Pop-up
             document.getElementById('modal-success-title').textContent = 'Success!';
             document.getElementById('modal-success-msg').textContent = data.message;
             document.getElementById('success-modal').style.display = 'flex';
-            
+
             resetTimer();
             window.location.hash = 'dashboard';
         } else {
@@ -155,7 +155,7 @@ document.getElementById('form-login').addEventListener('submit', async (e) => {
 document.getElementById('form-register').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = e.target.querySelector('button');
-    
+
     const email = document.getElementById('reg-email').value;
     const password = document.getElementById('reg-password').value;
 
@@ -308,7 +308,10 @@ document.getElementById('form-search').addEventListener('submit', async (e) => {
                         </div>
                         <div style="display:flex; gap:10px;">
                             <button onclick="viewPublicProfile(${user.id})" class="btn" style="padding: 0.5rem 1rem;">Profile</button>
-                            <button onclick="prepTransfer(this.getAttribute('data-uname'))" data-uname="${safeUsername}" class="btn" style="padding: 0.5rem 1rem; background-color: var(--success);">Send</button>
+                            ${user.id == currentUser.id
+                        ? `<button disabled class="btn" style="padding: 0.5rem 1rem; background-color: var(--text-muted); cursor: not-allowed; opacity: 0.6;">You</button>`
+                        : `<button onclick="prepTransfer(this.getAttribute('data-uname'))" data-uname="${safeUsername}" class="btn" style="padding: 0.5rem 1rem; background-color: var(--success);">Send</button>`
+                    }
                         </div>
                     </div>
                 `;

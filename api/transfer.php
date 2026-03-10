@@ -28,11 +28,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'search') {
         exit;
     }
 
-    $stmt = $pdo->prepare("SELECT id, username, profile_image FROM users WHERE (LOWER(username) LIKE LOWER(?) OR id = ?) AND id != ?");
-    $stmt->execute(["%$search%", $search, $user_id]);
+    if (is_numeric($search)) {
+        $stmt = $pdo->prepare("SELECT id, username, profile_image FROM users WHERE LOWER(username) LIKE LOWER(?) OR id = ?");
+        $stmt->execute(["%$search%", $search]);
+    } else {
+        $stmt = $pdo->prepare("SELECT id, username, profile_image FROM users WHERE LOWER(username) LIKE LOWER(?)");
+        $stmt->execute(["%$search%"]);
+    }
+    
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    log_activity('api/transfer/search', $_SESSION['username']);
+    // log_activity is removed, so we won't log here
     echo json_encode(['status' => 'success', 'data' => $results]);
     exit;
 }
