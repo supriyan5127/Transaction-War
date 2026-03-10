@@ -91,28 +91,38 @@ function updateTimerDisplay() {
 
 function resetTimer() {
     clearTimeout(logoutTimer);
-    clearInterval(countdownInterval);
-    if (currentUser) {
-        document.getElementById('timeout-timer').style.display = 'block';
-        secondsRemaining = TIMEOUT_SECONDS;
-        updateTimerDisplay();
 
-        countdownInterval = setInterval(() => {
-            secondsRemaining--;
+    // Only reset if we are actually close to dropping a second 
+    // to prevent rapid overlapping calls on mouse move
+    if (secondsRemaining < TIMEOUT_SECONDS - 5 || !countdownInterval) {
+        clearInterval(countdownInterval);
+
+        if (currentUser) {
+            document.getElementById('timeout-timer').style.display = 'block';
+            secondsRemaining = TIMEOUT_SECONDS;
             updateTimerDisplay();
-            if (secondsRemaining <= 0) {
-                clearInterval(countdownInterval);
-            }
-        }, 1000);
 
+            countdownInterval = setInterval(() => {
+                secondsRemaining--;
+                updateTimerDisplay();
+                if (secondsRemaining <= 0) {
+                    clearInterval(countdownInterval);
+                }
+            }, 1000);
+        }
+    }
+
+    if (currentUser) {
         logoutTimer = setTimeout(async () => {
             await fetch(API_URL + 'auth.php?action=logout', { method: 'POST' });
             currentUser = null;
+            clearInterval(countdownInterval);
             document.getElementById('timeout-timer').style.display = 'none';
             showAlert('Session expired due to inactivity. Logged out.', 'error');
             navigate();
         }, TIMEOUT_SECONDS * 1000);
     } else {
+        clearInterval(countdownInterval);
         document.getElementById('timeout-timer').style.display = 'none';
     }
 }
