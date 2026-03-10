@@ -89,41 +89,58 @@ function updateTimerDisplay() {
     document.getElementById('timer-display').textContent = `${min}:${sec.toString().padStart(2, '0')}`;
 }
 
-function resetTimer(newTime = null) {
-    clearTimeout(logoutTimer);
+let activityTimeout = null;
+
+function startCountdown() {
     clearInterval(countdownInterval);
+    countdownInterval = setInterval(() => {
+        if (!currentUser) {
+            clearInterval(countdownInterval);
+            return;
+        }
 
-    if (newTime !== null) {
-        secondsRemaining = newTime;
-    }
-
-    if (currentUser && secondsRemaining > 0) {
-        document.getElementById('timeout-timer').style.display = 'block';
+        secondsRemaining--;
         updateTimerDisplay();
 
-        countdownInterval = setInterval(() => {
-            secondsRemaining--;
-            updateTimerDisplay();
-            if (secondsRemaining <= 0) {
-                clearInterval(countdownInterval);
-            }
-        }, 1000);
-
-        logoutTimer = setTimeout(async () => {
-            await fetch(API_URL + 'auth.php?action=logout', { method: 'POST' });
-            currentUser = null;
-            clearInterval(countdownInterval);
+        // Show warning only in the last 60 seconds (1 minute)
+        if (secondsRemaining <= 60 && secondsRemaining > 0) {
+            document.getElementById('timeout-timer').style.display = 'block';
+        } else if (secondsRemaining > 60) {
             document.getElementById('timeout-timer').style.display = 'none';
-            showAlert('Session expired. Logged out.', 'error');
-            navigate();
-        }, secondsRemaining * 1000);
-    } else {
-        clearInterval(countdownInterval);
-        document.getElementById('timeout-timer').style.display = 'none';
-    }
+        }
+
+        if (secondsRemaining <= 0) {
+            clearInterval(countdownInterval);
+            logoutUserDueToTimeout();
+        }
+    }, 1000);
 }
-// Removed window.addEventListener for mousemove, keypress, click, scroll etc.
-// The timer will now strictly count down from exactly 10 minutes without resetting.
+
+async function logoutUserDueToTimeout() {
+    await fetch(API_URL + 'auth.php?action=logout', { method: 'POST' });
+    currentUser = null;
+    document.getElementById('timeout-timer').style.display = 'none';
+    showAlert('Session expired due to inactivity. Logged out.', 'error');
+    navigate();
+}
+
+function resetTimer() {
+    if (!currentUser) return;
+
+    // Throttle the actual reset to prevent performance issues / flickering
+    if (activityTimeout) clearTimeout(activityTimeout);
+
+    activityTimeout = setTimeout(() => {
+        secondsRemaining = TIMEOUT_SECONDS;
+        document.getElementById('timeout-timer').style.display = 'none';
+        startCountdown();
+    }, 500); // 500ms debounce
+}
+
+window.addEventListener('mousemove', resetTimer);
+window.addEventListener('keypress', resetTimer);
+window.addEventListener('click', resetTimer);
+window.addEventListener('scroll', resetTimer);
 
 
 // User Session Check
@@ -134,7 +151,7 @@ async function initApp() {
         if (data.status === 'success') {
             currentUser = data.user;
             document.getElementById('nav-username').textContent = currentUser.username;
-            resetTimer(data.remaining);
+            resetTimer();
         } else {
             currentUser = null;
         }
@@ -169,7 +186,7 @@ document.getElementById('form-login').addEventListener('submit', async (e) => {
             document.getElementById('modal-success-msg').textContent = data.message;
             document.getElementById('success-modal').style.display = 'flex';
 
-            resetTimer(TIMEOUT_SECONDS);
+            resetTimer();
             window.location.hash = 'dashboard';
         } else {
             showAlert(data.message);
