@@ -264,14 +264,14 @@ async function loadDashboard() {
                 const safeDate = escapeHTML(t.created_at);
                 const html = `
                     <tr>
-                        <td style="white-space: nowrap;">${safeDate}</td>
-                        <td style="white-space: nowrap;">${type}</td>
-                        <td style="white-space: nowrap;">${senderName}</td>
-                        <td style="white-space: nowrap;">${receiverName}</td>
-                        <td style="white-space: nowrap;" class="${isSender ? 'text-danger' : 'text-success'}">
+                        <td style="white-space: nowrap;" class="td-date">${safeDate}</td>
+                        <td style="white-space: nowrap; font-weight: 600;">${type}</td>
+                        <td style="white-space: nowrap; color: var(--text-main);">${senderName}</td>
+                        <td style="white-space: nowrap; color: var(--text-main);">${receiverName}</td>
+                        <td style="white-space: nowrap; font-weight: 700;" class="${isSender ? 'text-danger' : 'text-success'}">
                             ${isSender ? '-' : '+'} Rs. ${parseFloat(t.amount).toFixed(2)}
                         </td>
-                        <td>${safeComment}</td>
+                        <td class="td-comment">${safeComment || '<span style="opacity:0.3">--</span>'}</td>
                     </tr>
                 `;
                 tbody.insertAdjacentHTML('beforeend', html);
