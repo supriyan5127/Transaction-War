@@ -83,11 +83,7 @@ let countdownInterval;
 const TIMEOUT_SECONDS = 10 * 60;
 let secondsRemaining = TIMEOUT_SECONDS;
 
-function updateTimerDisplay() {
-    const min = Math.floor(secondsRemaining / 60);
-    const sec = secondsRemaining % 60;
-    document.getElementById('timer-display').textContent = `${min}:${sec.toString().padStart(2, '0')}`;
-}
+
 
 let activityTimeout = null;
 
@@ -100,14 +96,6 @@ function startCountdown() {
         }
 
         secondsRemaining--;
-        updateTimerDisplay();
-
-        // Show warning only in the last 60 seconds (1 minute)
-        if (secondsRemaining <= 60 && secondsRemaining > 0) {
-            document.getElementById('timeout-timer').style.display = 'block';
-        } else if (secondsRemaining > 60) {
-            document.getElementById('timeout-timer').style.display = 'none';
-        }
 
         if (secondsRemaining <= 0) {
             clearInterval(countdownInterval);
@@ -119,7 +107,6 @@ function startCountdown() {
 async function logoutUserDueToTimeout() {
     await fetch(API_URL + 'auth.php?action=logout', { method: 'POST' });
     currentUser = null;
-    document.getElementById('timeout-timer').style.display = 'none';
     showAlert('Session expired due to inactivity. Logged out.', 'error');
     navigate();
 }
@@ -132,7 +119,6 @@ function resetTimer() {
 
     activityTimeout = setTimeout(() => {
         secondsRemaining = TIMEOUT_SECONDS;
-        document.getElementById('timeout-timer').style.display = 'none';
         startCountdown();
     }, 500); // 500ms debounce
 }
@@ -243,7 +229,6 @@ document.getElementById('logout-btn').addEventListener('click', async (e) => {
     e.preventDefault();
     await fetch(API_URL + 'auth.php?action=logout', { method: 'POST' });
     currentUser = null;
-    document.getElementById('timeout-timer').style.display = 'none';
     window.location.hash = 'login';
 });
 
