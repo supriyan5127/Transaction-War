@@ -4,7 +4,7 @@ require_once __DIR__ . '/../logger.php';
 session_start();
 
 // 10-minute session timeout
-if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 600)) {
+if (isset($_SESSION['login_time']) && (time() - $_SESSION['login_time'] > 600)) {
     session_unset();
     session_destroy();
     echo json_encode(['status' => 'error', 'message' => 'Session expired. Please log in again.']);
@@ -15,8 +15,6 @@ if (!isset($_SESSION['user_id'])) {
     echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
     exit;
 }
-
-$_SESSION['last_activity'] = time();
 
 $action = $_GET['action'] ?? '';
 $user_id = $_SESSION['user_id'];

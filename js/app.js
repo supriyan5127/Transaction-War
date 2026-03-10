@@ -89,30 +89,26 @@ function updateTimerDisplay() {
     document.getElementById('timer-display').textContent = `${min}:${sec.toString().padStart(2, '0')}`;
 }
 
-function resetTimer() {
+function resetTimer(newTime = null) {
     clearTimeout(logoutTimer);
+    clearInterval(countdownInterval);
 
-    // Only reset if we are actually close to dropping a second 
-    // to prevent rapid overlapping calls on mouse move
-    if (secondsRemaining < TIMEOUT_SECONDS - 5 || !countdownInterval) {
-        clearInterval(countdownInterval);
-
-        if (currentUser) {
-            document.getElementById('timeout-timer').style.display = 'block';
-            secondsRemaining = TIMEOUT_SECONDS;
-            updateTimerDisplay();
-
-            countdownInterval = setInterval(() => {
-                secondsRemaining--;
-                updateTimerDisplay();
-                if (secondsRemaining <= 0) {
-                    clearInterval(countdownInterval);
-                }
-            }, 1000);
-        }
+    if (newTime !== null) {
+        secondsRemaining = newTime;
     }
 
-    if (currentUser) {
+    if (currentUser && secondsRemaining > 0) {
+        document.getElementById('timeout-timer').style.display = 'block';
+        updateTimerDisplay();
+
+        countdownInterval = setInterval(() => {
+            secondsRemaining--;
+            updateTimerDisplay();
+            if (secondsRemaining <= 0) {
+                clearInterval(countdownInterval);
+            }
+        }, 1000);
+
         logoutTimer = setTimeout(async () => {
             await fetch(API_URL + 'auth.php?action=logout', { method: 'POST' });
             currentUser = null;
@@ -120,7 +116,7 @@ function resetTimer() {
             document.getElementById('timeout-timer').style.display = 'none';
             showAlert('Session expired. Logged out.', 'error');
             navigate();
-        }, TIMEOUT_SECONDS * 1000);
+        }, secondsRemaining * 1000);
     } else {
         clearInterval(countdownInterval);
         document.getElementById('timeout-timer').style.display = 'none';
@@ -138,7 +134,7 @@ async function initApp() {
         if (data.status === 'success') {
             currentUser = data.user;
             document.getElementById('nav-username').textContent = currentUser.username;
-            resetTimer();
+            resetTimer(data.remaining);
         } else {
             currentUser = null;
         }
@@ -173,7 +169,7 @@ document.getElementById('form-login').addEventListener('submit', async (e) => {
             document.getElementById('modal-success-msg').textContent = data.message;
             document.getElementById('success-modal').style.display = 'flex';
 
-            resetTimer();
+            resetTimer(TIMEOUT_SECONDS);
             window.location.hash = 'dashboard';
         } else {
             showAlert(data.message);

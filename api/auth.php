@@ -4,15 +4,13 @@ require_once __DIR__ . '/../logger.php';
 session_start();
 
 // 10-minute session timeout
-if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 600)) {
+if (isset($_SESSION['login_time']) && (time() - $_SESSION['login_time'] > 600)) {
     session_unset();
     session_destroy();
     if (isset($_GET['action']) && $_GET['action'] !== 'login' && $_GET['action'] !== 'register') {
         echo json_encode(['status' => 'error', 'message' => 'Session expired. Please log in again.']);
         exit;
     }
-} elseif (isset($_SESSION['user_id'])) {
-    $_SESSION['last_activity'] = time();
 }
 
 $action = $_GET['action'] ?? '';
@@ -82,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($user && password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
-            $_SESSION['last_activity'] = time();
+            $_SESSION['login_time'] = time();
             log_activity('api/auth/login', $username);
             echo json_encode([
                 'status' => 'success', 
@@ -105,7 +103,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'check') {
     if (isset($_SESSION['user_id'])) {
-        echo json_encode(['status' => 'success', 'user' => ['id' => $_SESSION['user_id'], 'username' => $_SESSION['username']]]);
+        $remaining = 600 - (time() - $_SESSION['login_time']);
+        if ($remaining < 0) $remaining = 0;
+        echo json_encode(['status' => 'success', 'user' => ['id' => $_SESSION['user_id'], 'username' => $_SESSION['username']], 'remaining' => $remaining]);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Not authenticated']);
     }
