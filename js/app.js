@@ -118,7 +118,7 @@ function resetTimer() {
             currentUser = null;
             clearInterval(countdownInterval);
             document.getElementById('timeout-timer').style.display = 'none';
-            showAlert('Session expired due to inactivity. Logged out.', 'error');
+            showAlert('Session expired. Logged out.', 'error');
             navigate();
         }, TIMEOUT_SECONDS * 1000);
     } else {
@@ -126,10 +126,9 @@ function resetTimer() {
         document.getElementById('timeout-timer').style.display = 'none';
     }
 }
-window.addEventListener('mousemove', resetTimer);
-window.addEventListener('keypress', resetTimer);
-window.addEventListener('click', resetTimer);
-window.addEventListener('scroll', resetTimer);
+// Removed window.addEventListener for mousemove, keypress, click, scroll etc.
+// The timer will now strictly count down from exactly 10 minutes without resetting.
+
 
 // User Session Check
 async function initApp() {
