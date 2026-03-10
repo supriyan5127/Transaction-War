@@ -3,15 +3,23 @@
 require_once __DIR__ . '/db.php';
 
 function get_client_ip() {
-    $ip = $_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN';
-    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-        $ip = $_SERVER['HTTP_CLIENT_IP'];
-    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        // X-Forwarded-For can contain a list of IPs. The true client is usually the first.
-        $ipList = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-        $ip = trim($ipList[0]);
+    $headers = [
+        'HTTP_CF_CONNECTING_IP', // Cloudflare
+        'HTTP_X_REAL_IP',        // NGINX Proxy
+        'HTTP_X_FORWARDED_FOR',  // Standard Proxy
+        'REMOTE_ADDR'            // Fallback
+    ];
+
+    foreach ($headers as $header) {
+        if (!empty($_SERVER[$header])) {
+            $ips = explode(',', $_SERVER[$header]);
+            $ip = trim($ips[0]); // Get the true client at the start of the list
+            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                return $ip;
+            }
+        }
     }
-    return $ip;
+    return $_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN';
 }
 
 function log_activity($webpage, $username = 'Guest') {
