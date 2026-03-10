@@ -264,11 +264,11 @@ async function loadDashboard() {
                 const safeDate = escapeHTML(t.created_at);
                 const html = `
                     <tr>
-                        <td>${safeDate}</td>
-                        <td>${type}</td>
-                        <td>${senderName}</td>
-                        <td>${receiverName}</td>
-                        <td class="${isSender ? 'text-danger' : 'text-success'}">
+                        <td style="white-space: nowrap;">${safeDate}</td>
+                        <td style="white-space: nowrap;">${type}</td>
+                        <td style="white-space: nowrap;">${senderName}</td>
+                        <td style="white-space: nowrap;">${receiverName}</td>
+                        <td style="white-space: nowrap;" class="${isSender ? 'text-danger' : 'text-success'}">
                             ${isSender ? '-' : '+'} Rs. ${parseFloat(t.amount).toFixed(2)}
                         </td>
                         <td>${safeComment}</td>
