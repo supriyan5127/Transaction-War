@@ -121,17 +121,19 @@
 
     <!-- Search View -->
     <div id="view-search" class="container view" style="display: none;">
-        <div class="auth-container" style="margin-top: 2rem; max-width: 600px;">
-            <h2>Search Users</h2>
-            <form id="form-search" style="display:flex; gap:10px;">
+        <div class="auth-container" style="max-width: 600px; text-align: center;">
+            <h2 style="margin-bottom: 1.5rem;">Search Users</h2>
+            <form id="form-search" style="display:flex; flex-direction: column; gap:15px; align-items: center;">
                 <input type="text" id="search-query" placeholder="Enter username or User ID..." required
-                    style="flex-grow:1;">
-                <button type="submit" class="btn" style="width:auto;">Search</button>
+                    style="width: 100%; text-align: center;">
+                <button type="submit" class="btn" style="width: 200px;">Search</button>
             </form>
-            <div id="search-results-container" style="margin-top:2rem; display:none;">
-                <h3 id="search-title">Results</h3>
+            <div id="search-results-container" style="margin-top:2.5rem; display:none; text-align: left;">
+                <h3 id="search-title"
+                    style="text-align: center; color: var(--text-muted); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                    Results</h3>
                 <div id="search-results-list"
-                    style="margin-top:1rem; border:1px solid var(--border-color); border-radius:8px;">
+                    style="margin-top:1rem; border:1px solid var(--border-color); border-radius:12px; overflow: hidden; background-color: rgba(255,255,255,0.02);">
                     <!-- Populated via JS -->
                 </div>
             </div>
