@@ -7,10 +7,10 @@ ini_set('session.cookie_httponly', 1);
 ini_set('session.use_only_cookies', 1);
 ini_set('session.cookie_samesite', 'Strict');
 
-$host = getenv('DB_HOST') ?: 'db';
+$host = getenv('DB_HOST') ?: 'localhost';
 $dbname = getenv('DB_NAME') ?: 'transaction_db';
-$user = getenv('DB_USER') ?: 'admin';
-$pass = getenv('DB_PASS') ?: 'adminpassword';
+$user = getenv('DB_USER') ?: 'root';
+$pass = getenv('DB_PASS') ?: '';
 
 try {
     $dsn = "mysql:host=$host;dbname=$dbname;charset=utf8mb4";

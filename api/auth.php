@@ -107,8 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'check') {
     if (isset($_SESSION['user_id'])) {
         echo json_encode(['status' => 'success', 'user' => ['id' => $_SESSION['user_id'], 'username' => $_SESSION['username']]]);
     } else {
-        require_once __DIR__ . '/../logger.php';
-        echo json_encode(['status' => 'error', 'message' => 'Not authenticated', 'ip' => get_client_ip()]);
+        echo json_encode(['status' => 'error', 'message' => 'Not authenticated']);
     }
     exit;
 }

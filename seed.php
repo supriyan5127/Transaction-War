@@ -6,7 +6,7 @@ require_once __DIR__ . '/db.php';
 try {
     $pdo->exec("
     CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(255) UNIQUE NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         password VARCHAR(255) NOT NULL,
@@ -15,9 +15,9 @@ try {
         profile_image VARCHAR(255)
     );
     CREATE TABLE IF NOT EXISTS transactions (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        sender_id INTEGER,
-        receiver_id INTEGER,
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        sender_id INT,
+        receiver_id INT,
         amount REAL NOT NULL,
         comment TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -25,10 +25,9 @@ try {
         FOREIGN KEY (receiver_id) REFERENCES users(id)
     );
     CREATE TABLE IF NOT EXISTS activity_logs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         webpage VARCHAR(255),
         username VARCHAR(255),
-        ip_address VARCHAR(45),
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
     ");

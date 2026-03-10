@@ -23,6 +23,5 @@ CREATE TABLE IF NOT EXISTS activity_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     webpage VARCHAR(255),
     username VARCHAR(255),
-    ip_address VARCHAR(45),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

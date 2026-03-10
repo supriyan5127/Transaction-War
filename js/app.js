@@ -109,10 +109,6 @@ async function initApp() {
             resetTimer();
         } else {
             currentUser = null;
-            if (data.ip) {
-                document.getElementById('client-ip-display').textContent = escapeHTML(data.ip);
-                document.getElementById('login-session-badge').style.display = 'flex';
-            }
         }
     } catch (e) {
         currentUser = null;
