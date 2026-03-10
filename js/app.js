@@ -31,15 +31,12 @@ function navigate() {
     views.forEach(v => v.style.display = 'none');
     const activeView = document.getElementById(`view-${hash}`);
     if (activeView) {
-        if (hash === 'login' || hash === 'register') {
-            activeView.style.display = 'flex';
-            activeView.style.flexDirection = 'column';
-            activeView.style.justifyContent = 'center';
-            activeView.style.alignItems = 'center';
-            activeView.style.minHeight = '80vh';
-        } else {
-            activeView.style.display = 'block';
-        }
+        activeView.style.display = 'flex';
+        activeView.style.flexDirection = 'column';
+        activeView.style.justifyContent = 'center';
+        activeView.style.alignItems = 'center';
+        activeView.style.minHeight = '80vh';
+        activeView.style.width = '100%';
     }
 
     // Highlight Nav

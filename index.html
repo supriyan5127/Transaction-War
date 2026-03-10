@@ -67,33 +67,35 @@
 
     <!-- Dashboard View -->
     <div id="view-dashboard" class="container view" style="display: none;">
-        <h1 id="dash-greeting">Welcome!</h1>
-        <div class="balance-card">
-            <h2>Current Balance</h2>
-            <div class="amount" id="dash-balance">Rs. 0.00</div>
-        </div>
+        <div style="width: 100%; max-width: 600px; text-align: center;">
+            <h1 id="dash-greeting">Welcome!</h1>
+            <div class="balance-card">
+                <h2>Current Balance</h2>
+                <div class="amount" id="dash-balance">Rs. 0.00</div>
+            </div>
 
-        <h3>Recent Transactions</h3>
-        <table class="table" id="table-transactions">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>User</th>
-                    <th>Amount</th>
-                    <th>Comment</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Populated via JS -->
-            </tbody>
-        </table>
-        <p id="no-tx-msg" style="display: none;">No transactions yet.</p>
+            <h3 style="margin-top: 2rem;">Recent Transactions</h3>
+            <table class="table" id="table-transactions" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>User</th>
+                        <th>Amount</th>
+                        <th>Comment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Populated via JS -->
+                </tbody>
+            </table>
+            <p id="no-tx-msg" style="display: none;">No transactions yet.</p>
+        </div>
     </div>
 
     <!-- Transfer View -->
     <div id="view-transfer" class="container view" style="display: none;">
-        <div class="auth-box" style="margin-top: 2rem;">
+        <div class="auth-container" style="margin-top: 2rem;">
             <h2>Transfer Money</h2>
             <p class="text-muted" style="margin-bottom:1.5rem; text-align: center;">Your current balance: <strong
                     id="transfer-balance">Rs.
@@ -118,7 +120,7 @@
 
     <!-- Search View -->
     <div id="view-search" class="container view" style="display: none;">
-        <div class="auth-box" style="margin-top: 2rem; max-width: 600px;">
+        <div class="auth-container" style="margin-top: 2rem; max-width: 600px;">
             <h2>Search Users</h2>
             <form id="form-search" style="display:flex; gap:10px;">
                 <input type="text" id="search-query" placeholder="Enter username or User ID..." required
@@ -137,7 +139,7 @@
 
     <!-- Profile View -->
     <div id="view-profile" class="container view" style="display: none;">
-        <div class="auth-box" style="margin-top: 2rem; max-width: 500px;">
+        <div class="auth-container" style="margin-top: 2rem; max-width: 500px;">
             <h2>Your Profile</h2>
             <form id="form-profile" enctype="multipart/form-data">
                 <div class="form-group" style="display:flex; flex-direction:column; align-items:center;">
@@ -166,7 +168,7 @@
 
     <!-- Public View (Read Only Profile of others) -->
     <div id="view-public" class="container view" style="display: none;">
-        <div class="auth-box" style="margin-top: 2rem; max-width: 500px;">
+        <div class="auth-container" style="margin-top: 2rem; max-width: 500px;">
             <div class="profile-header" style="text-align: center; margin-bottom: 2rem;">
                 <div class="profile-img-container" style="margin: 0 auto 1rem auto; width:150px; height:150px;">
                     <img id="public-img" src="" alt="Profile">
