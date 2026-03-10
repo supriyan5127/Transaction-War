@@ -258,14 +258,16 @@ async function loadDashboard() {
             txns.data.forEach(t => {
                 const isSender = t.sender_id == txns.current_id;
                 const type = isSender ? 'Sent' : 'Received';
-                const otherUser = escapeHTML(isSender ? t.receiver : t.sender);
+                const senderName = escapeHTML(t.sender);
+                const receiverName = escapeHTML(t.receiver);
                 const safeComment = escapeHTML(t.comment);
                 const safeDate = escapeHTML(t.created_at);
                 const html = `
                     <tr>
                         <td>${safeDate}</td>
                         <td>${type}</td>
-                        <td>${otherUser}</td>
+                        <td>${senderName}</td>
+                        <td>${receiverName}</td>
                         <td class="${isSender ? 'text-danger' : 'text-success'}">
                             ${isSender ? '-' : '+'} Rs. ${parseFloat(t.amount).toFixed(2)}
                         </td>
