@@ -24,6 +24,12 @@
     <!-- Alert Container -->
     <div class="container" id="alert-container" style="display: none;"></div>
 
+    <!-- Timeout Timer (Hidden on Auth pages) -->
+    <div id="timeout-timer"
+        style="display: none; position: fixed; bottom: 20px; right: 20px; background-color: var(--card-bg); border: 1px solid var(--border-color); padding: 10px 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4); font-weight: 600; color: var(--text-muted); z-index: 1000;">
+        Auto-logout in: <span id="timer-display" style="color: var(--primary);">10:00</span>
+    </div>
+
     <!-- MAIN VIEWS -->
 
     <!-- Login View -->
@@ -148,6 +154,10 @@
                     </div>
                     <label>Profile Image</label>
                     <input type="file" id="profile-image-input" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label>User ID</label>
+                    <input type="text" id="prof-userid" disabled>
                 </div>
                 <div class="form-group">
                     <label>Username (Cannot be changed)</label>

@@ -79,15 +79,41 @@ function getDefaultAvatar(name) {
 
 // Auto Logout Timer
 let logoutTimer;
+let countdownInterval;
+const TIMEOUT_SECONDS = 10 * 60;
+let secondsRemaining = TIMEOUT_SECONDS;
+
+function updateTimerDisplay() {
+    const min = Math.floor(secondsRemaining / 60);
+    const sec = secondsRemaining % 60;
+    document.getElementById('timer-display').textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+}
+
 function resetTimer() {
     clearTimeout(logoutTimer);
+    clearInterval(countdownInterval);
     if (currentUser) {
+        document.getElementById('timeout-timer').style.display = 'block';
+        secondsRemaining = TIMEOUT_SECONDS;
+        updateTimerDisplay();
+
+        countdownInterval = setInterval(() => {
+            secondsRemaining--;
+            updateTimerDisplay();
+            if (secondsRemaining <= 0) {
+                clearInterval(countdownInterval);
+            }
+        }, 1000);
+
         logoutTimer = setTimeout(async () => {
             await fetch(API_URL + 'auth.php?action=logout', { method: 'POST' });
             currentUser = null;
+            document.getElementById('timeout-timer').style.display = 'none';
             showAlert('Session expired due to inactivity. Logged out.', 'error');
             navigate();
-        }, 10 * 60 * 1000); // 10 minutes
+        }, TIMEOUT_SECONDS * 1000);
+    } else {
+        document.getElementById('timeout-timer').style.display = 'none';
     }
 }
 window.addEventListener('mousemove', resetTimer);
@@ -195,6 +221,7 @@ document.getElementById('logout-btn').addEventListener('click', async (e) => {
     e.preventDefault();
     await fetch(API_URL + 'auth.php?action=logout', { method: 'POST' });
     currentUser = null;
+    document.getElementById('timeout-timer').style.display = 'none';
     window.location.hash = 'login';
 });
 
@@ -351,6 +378,7 @@ async function loadProfile() {
     const data = await res.json();
     if (data.status === 'success') {
         const p = data.data;
+        document.getElementById('prof-userid').value = p.id;
         document.getElementById('prof-username').value = p.username;
         document.getElementById('prof-email').value = p.email;
         document.getElementById('prof-bio').value = p.bio || '';
